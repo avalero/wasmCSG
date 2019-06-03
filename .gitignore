@@ -1,0 +1,6 @@
+dist
+Makefile
+wasmCSG.pro.user
+.vscode
+node_modules
+.qmake.stash

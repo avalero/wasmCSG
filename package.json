@@ -1,0 +1,12 @@
+{
+  "name": "my-worldchanging-project",
+  "scripts": {
+    "build:emscripten": "docker run --rm -v $(pwd):/src trzeci/emscripten ./build-wasm.sh",
+    "build:app": "cp src/index.html dist/index.html",
+    "build": "npm run build:emscripten && npm run build:app",
+    "serve": "http-server -c0 dist"
+  },
+  "devDependencies": {
+    "http-server": "*"
+  }
+}

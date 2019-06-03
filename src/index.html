@@ -1,0 +1,12 @@
+<!doctype html>
+<title>Emscripten + npm example</title>
+Open the console to see the output from the wasm module.
+<script type="module">
+  import wasmModule from "./wasmcsg.js";
+
+  const instance = wasmModule({
+    onRuntimeInitialized() {
+      console.log("Wasm Ready");
+    }
+  });
+</script>
