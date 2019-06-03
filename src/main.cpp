@@ -24,7 +24,17 @@ int main()
   std::cout << v << std::endl;
   Vertex u = v.clone();
   v.add(&u);
-  std::cout << v << std::endl;
-  std::cout << &u << std::endl;
+  std::cout <<"v: " << v << std::endl;
+  std::cout << "u: " << u << std::endl;
+
+  v.normalize();
+
+  std::cout << "v.normalize: " << v << std::endl;
+
+
+  v.cross(&u);
+
+  std::cout << "v.cross(u): " << v << std::endl;
+
   return 0;
 }
