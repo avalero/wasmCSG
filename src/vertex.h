@@ -12,41 +12,41 @@ class Vertex
     friend std::ostream & operator << (std::ostream& os, Vertex* const v);
     friend std::ostream & operator << (std::ostream& os, Vertex const & v);
 public:
-    Vertex(float x, float y, float z, Vector3* normal = nullptr, Vector2* uv = nullptr);
-    Vertex(Vertex* v);
+    Vertex(double x, double y, double z, Vector3* normal = nullptr, Vector2* uv = nullptr);
+    Vertex(const Vertex *v);
     /**
      * @brief clone
      * @return Vertex object clone
      */
-    Vertex* clone();
+    Vertex* clone() const;
 
     /**
      * @brief add other Vertex to this object
      * @param other Vertex
      * @return this object (after addition)
      */
-    Vertex* add(Vertex* other);
+    Vertex* add(const Vertex *other);
 
     /**
      * @brief subtract other Vertex to this object
      * @param other Vertex
      * @return this object (after subtraction)
      */
-    Vertex* subtract(Vertex* other);
+    Vertex* subtract(const Vertex *other);
 
     /**
      * @brief scalar multiply this vector with a number
      * @param number
      * @return this multplied vector
      */
-    Vertex* multiplyScalar(float number);
+    Vertex* multiplyScalar(double number);
 
     /**
      * @brief cross multiplication
      * @param other
      * @return the modified Vertex
      */
-    Vertex* cross(Vertex* other);
+    Vertex* cross(const Vertex *other);
 
     /**
      * @brief normalize
@@ -59,16 +59,16 @@ public:
      * @param other
      * @return the resulting number
      */
-    float dot(Vertex* other);
+    double dot(const Vertex *other);
 
-    Vertex* lerp(Vertex* a, float t);
+    Vertex* lerp(Vertex* a, double t);
 
-    Vertex* interpolate(Vertex* other, float t);
+    Vertex* interpolate(Vertex* other, double t);
 
     Vertex* applyMatrix4(Matrix4* m);
 
 private:
-  float x, y, z;
+  double x, y, z;
   Vector3* normal;
   Vector2* uv;
 };

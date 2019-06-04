@@ -8,7 +8,7 @@ class Matrix4
 public:
     Matrix4();
 
-    std::array<float, 16>* elements;
+    std::array<double, 16>* elements;
 };
 
 #endif // MATRIX4_H
