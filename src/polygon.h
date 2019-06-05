@@ -12,7 +12,7 @@ class Polygon
 public:
     Polygon(const std::vector<Vertex *> &vertices = {}, Vertex* normal = nullptr, double w = 0);
     Polygon *calculateProperties();
-    Polygon* clone();
+    Polygon* clone() const;
     Polygon* flip();
     int classifyVertex(const Vertex* vertex);
     int classifySide(const Polygon* polygon);
@@ -27,12 +27,6 @@ private:
     std::vector<Vertex*> vertices;
     Vertex* normal;
     double w;
-
-    const double EPSILON = 1e-5;
-    const int COPLANAR = 0;
-    const int FRONT = 1;
-    const int BACK = 2;
-    const int SPANNING = 3;
 };
 
 #endif

@@ -8,12 +8,12 @@ Vector3::Vector3(double x, double y, double z):
 
 }
 
-Vector3 *Vector3::clone()
+Vector3 *Vector3::clone() const
 {
     return new Vector3(x,y,z);
 }
 
-Vector3 *Vector3::add(Vector3 *other)
+Vector3 *Vector3::add(const Vector3 *other)
 {
     x += other->x;
     y += other->y;
@@ -22,7 +22,7 @@ Vector3 *Vector3::add(Vector3 *other)
 
 }
 
-Vector3 *Vector3::sub(Vector3 *other)
+Vector3 *Vector3::sub(const Vector3 *other)
 {
     x -= other->x;
     y -= other->y;

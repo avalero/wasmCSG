@@ -3,6 +3,7 @@
 #include "vector2.h"
 #include "vector3.h"
 
+#include "constants.h"
 
 Polygon::Polygon(std::vector<Vertex *> const & vertices, Vertex *normal, double w):
     vertices{vertices}
@@ -28,7 +29,7 @@ Polygon* Polygon::calculateProperties()
     return this;
 }
 
-Polygon *Polygon::clone()
+Polygon *Polygon::clone() const
 {
     unsigned long i, vertice_count;
     Polygon* polygon = new Polygon();

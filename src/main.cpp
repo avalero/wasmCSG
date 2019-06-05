@@ -3,6 +3,7 @@
 
 #include "polygon.h"
 #include "vertex.h"
+#include "node.h"
 
 // using namespace std;
 using namespace emscripten;

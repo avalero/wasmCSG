@@ -7,12 +7,12 @@ Vector2::Vector2(double x, double y):
 
 }
 
-Vector2 *Vector2::clone()
+Vector2 *Vector2::clone() const
 {
     return new Vector2(x,y);
 }
 
-Vector2 *Vector2::add(Vector2 *other)
+Vector2 *Vector2::add(const Vector2 *other)
 {
     x += other->x;
     y += other->y;
@@ -20,7 +20,7 @@ Vector2 *Vector2::add(Vector2 *other)
 
 }
 
-Vector2 *Vector2::sub(Vector2 *other)
+Vector2 *Vector2::sub(const Vector2 *other)
 {
     x -= other->x;
     y -= other->y;

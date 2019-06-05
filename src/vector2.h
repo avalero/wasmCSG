@@ -5,9 +5,9 @@ class Vector2
 {
 public:
     Vector2(double x=0, double y=0);
-    Vector2 *clone();
-    Vector2 *add(Vector2 *other);
-    Vector2 *sub(Vector2 *other);
+    Vector2 *clone() const;
+    Vector2 *add(const Vector2 *other);
+    Vector2 *sub(const Vector2 *other);
     Vector2 *multiplyScalar(double t);
 
 private:
