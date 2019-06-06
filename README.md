@@ -7,7 +7,7 @@ Tightly based on Three CSG JavaScript Library: https://github.com/chandlerprall/
 ### Prerequisites
 
 - Install emscripten compiler: https://emscripten.org/
-- Add emcc to you PATH
+- Add emcc to your PATH
 - Create a dist directory into project root directory
 
 ### Build
