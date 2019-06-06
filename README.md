@@ -1,7 +1,7 @@
 # wasmCSG
 Web Assembly Constructive Solid Geometry Module
 
-Tightly based on Three CSG JavaScript Library: https://github.com/chandlerprall/ThreeCSG
+This is a ThreeCSG JavaScript Library (https://github.com/chandlerprall/ThreeCSG) port to C++ to be compiled to WASM. The goal is to reduce computation time (when we get results we will post here a comparative)
 
 ## Build Instructions
 ### Prerequisites
