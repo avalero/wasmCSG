@@ -9,6 +9,7 @@ class Vector2;
 
 class Polygon
 {
+    friend class ThreeBSP;
 public:
     Polygon(const std::vector<Vertex *> &vertices = {}, Vertex* normal = nullptr, double w = 0);
     Polygon *calculateProperties();
@@ -23,7 +24,7 @@ public:
                      std::vector<Polygon*> & back
                      );
 
-private:
+protected:
     std::vector<Vertex*> vertices;
     Vertex* normal;
     double w;

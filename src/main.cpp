@@ -4,6 +4,7 @@
 #include "polygon.h"
 #include "vertex.h"
 #include "node.h"
+#include "threebsp.h"
 
 // using namespace std;
 using namespace emscripten;

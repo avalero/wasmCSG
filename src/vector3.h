@@ -4,6 +4,7 @@
 
 class Vector3
 {
+    friend class ThreeBSP;
 public:
     Vector3(double x = 0, double y = 0, double z = 0);
     Vector3* clone() const;
@@ -11,7 +12,7 @@ public:
     Vector3* sub(const Vector3* other);
     Vector3* multiplyScalar(double t);
 
-private:
+protected:
     double x,y,z;
 };
 

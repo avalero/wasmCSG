@@ -11,6 +11,7 @@ class Vertex
 {
     friend std::ostream & operator << (std::ostream& os, Vertex* const v);
     friend std::ostream & operator << (std::ostream& os, Vertex const & v);
+    friend class ThreeBSP;
 public:
     Vertex(double x, double y, double z, Vector3* normal = nullptr, Vector2* uv = nullptr);
     Vertex(const Vertex *v);
@@ -67,7 +68,7 @@ public:
 
     Vertex* applyMatrix4(Matrix4* m);
 
-private:
+protected:
   double x, y, z;
   Vector3* normal;
   Vector2* uv;
