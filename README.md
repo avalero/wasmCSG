@@ -14,8 +14,10 @@ Tightly based on Three CSG JavaScript Library: https://github.com/chandlerprall/
 
 ``
 npm install
+
 npm run build
 `` 
+
 js and wasm files will be located in dist folder
 
 ### Check
