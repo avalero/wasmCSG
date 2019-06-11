@@ -18,6 +18,7 @@ public:
     ThreeBSP *subtract(const ThreeBSP* other_tree) const;
     ThreeBSP *comp_union(const ThreeBSP* other_tree) const;
     ThreeBSP *intersect(const ThreeBSP* other_tree) const;
+    Geometry* toGeometry() const;
 
 private:
     Node* tree;

@@ -8,6 +8,7 @@ class Matrix4
 public:
     Matrix4();
 
+    Matrix4* getInverse(Matrix4* m);
     std::array<double, 16>* elements;
 };
 

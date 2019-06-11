@@ -11,12 +11,12 @@ class Vector3;
 class Geometry
 {
 public:
-    Geometry(std::vector<Face3*> faces,
-             std::vector< std::vector< std::array< Vector2*, 3 > > > faceVertexUvs,
-             std::vector< Vector3* > vertices);
+    Geometry(std::vector<Face3*> faces = {},
+             std::vector< std::vector< std::vector< Vector2*> > > faceVertexUvs = {},
+             std::vector< Vector3* > vertices = {});
 
     std::vector<Face3*> faces;
-    std::vector< std::vector< std::array< Vector2*, 3 > > > faceVertexUvs;
+    std::vector< std::vector< std::vector< Vector2* > > > faceVertexUvs;
     std::vector< Vector3* > vertices;
 };
 

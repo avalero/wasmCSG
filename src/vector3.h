@@ -1,6 +1,7 @@
 #ifndef VECTOR3_H
 #define VECTOR3_H
 
+class Matrix4;
 
 class Vector3
 {
@@ -11,6 +12,7 @@ public:
     Vector3* add(const Vector3* other);
     Vector3* sub(const Vector3* other);
     Vector3* multiplyScalar(double t);
+    Vector3* applyMatrix4(const Matrix4* matrix);
 
 protected:
     double x,y,z;
