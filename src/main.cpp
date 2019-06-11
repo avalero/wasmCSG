@@ -1,4 +1,5 @@
 #include <emscripten/bind.h>
+#include <emscripten.h>
 #include <iostream>
 
 #include "polygon.h"
@@ -9,25 +10,43 @@
 // using namespace std;
 using namespace emscripten;
 
+std::vector<Geometry*> geometries;
+
 int main()
 {
-  std::cout << "main" << std::endl;
+    geometries.clear();
+    return 0;
+}
 
-  Vertex v{2,1,0};
-  std::cout << v << std::endl;
-  Vertex u = v.clone();
-  v.add(&u);
-  std::cout <<"v: " << v << std::endl;
-  std::cout << "u: " << u << std::endl;
+extern "C" {
+    EMSCRIPTEN_KEEPALIVE
+    void buildCSG(float* buffer, int buffersize){
+        std::cout << "Hello from buildCSG" << std::endl;
+        std::cout << "Received a buffer of size " << buffersize << std::endl;
+        std::vector<float> my_vector {buffer, buffer + buffersize};
 
-  v.normalize();
+        for(auto a:my_vector){
+            std::cout << a << ", " ;
+        }
+        std::cout << std::endl;
+    }
 
-  std::cout << "v.normalize: " << v << std::endl;
+    // EMSCRIPTEN_KEEPALIVE
+    //void addGeometry(float* verticesBuffer, int vertices_size,
+    //                 float* normalsBuffer, int normals_size,
+    //                 float* positionBuffer, int position_size){
+    //    std::cout << "vertices size: " << vertices_size << std::endl;
+    //    std::cout << "normals size: " << normals_size << std::endl;
+    //    std::cout << "position size: " << position_size << std::endl;
+    //}
 
+    EMSCRIPTEN_KEEPALIVE
+    void addGeometry(float* verticesBuffer, int vertices_size){
+        std::cout << "vertices size: " << vertices_size << std::endl;
+    }
+}
 
-  v.cross(&u);
-
-  std::cout << "v.cross(u): " << v << std::endl;
-
-  return 0;
+EMSCRIPTEN_BINDINGS(wasmcsg_module) {
+    function("buildCSG", &buildCSG, allow_raw_pointers());
+    function("addGeometry", &addGeometry, allow_raw_pointers());
 }
