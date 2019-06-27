@@ -9,7 +9,7 @@ public:
     Matrix4();
 
     Matrix4* getInverse(Matrix4* m);
-    std::array<double, 16>* elements;
+    std::array<float, 16>* elements;
 };
 
 #endif // MATRIX4_H

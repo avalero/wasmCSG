@@ -11,7 +11,7 @@ class Polygon
 {
     friend class ThreeBSP;
 public:
-    Polygon(const std::vector<Vertex *> &vertices = {}, Vertex* normal = nullptr, double w = 0);
+    Polygon(const std::vector<Vertex *> &vertices = {}, Vertex* normal = nullptr, float w = 0);
     Polygon *calculateProperties();
     Polygon* clone() const;
     Polygon* flip();
@@ -27,7 +27,7 @@ public:
 protected:
     std::vector<Vertex*> vertices;
     Vertex* normal;
-    double w;
+    float w;
 };
 
 #endif

@@ -5,17 +5,17 @@
 
 
 Matrix4::Matrix4():
-    elements{new std::array<double, 16>{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,0, 0, 0, 1}}}
+    elements{new std::array<float, 16>{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,0, 0, 0, 1}}}
 {
 }
 
 Matrix4 *Matrix4::getInverse(Matrix4* m)
 {
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-    std::array<double, 16>* te = elements;
-    std::array<double, 16>*    me = m->elements;
+    std::array<float, 16>* te = elements;
+    std::array<float, 16>*    me = m->elements;
 
-    double n11 = me->at(0), n21 = me->at(1), n31 = me->at(2), n41 = me->at(3),
+    float n11 = me->at(0), n21 = me->at(1), n31 = me->at(2), n41 = me->at(3),
             n12 = me->at(4), n22 = me->at(5), n32 = me->at(6), n42 = me->at(7),
             n13 = me->at(8), n23 = me->at(9), n33 = me->at(10), n43 = me->at(11),
             n14 = me->at(12), n24 = me->at(13), n34 = me->at(14), n44 = me->at(15),
@@ -25,13 +25,13 @@ Matrix4 *Matrix4::getInverse(Matrix4* m)
             t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
             t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
 
-    double det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
+    float det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
     if ( det <= EPSILON ) {
         throw std::string{"Cannot compute determinant"};
     }
 
-    double detInv = 1 / det;
+    float detInv = 1 / det;
 
     te->at(0) = t11 * detInv;
     te->at(1) = ( n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44 ) * detInv;

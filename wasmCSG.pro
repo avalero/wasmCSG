@@ -5,6 +5,7 @@ CONFIG -= qt
 INCLUDEPATH += $$(EMSDK)/fastcomp/emscripten/system/include/
 
 SOURCES += \
+        src/buffergeometry.cpp \
         src/face3.cpp \
         src/geometry.cpp \
         src/node.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
         src/vertex.cpp
 
 HEADERS += \
+        src/buffergeometry.h \
         src/constants.h \
         src/face3.h \
         src/geometry.h \

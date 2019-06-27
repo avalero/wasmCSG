@@ -13,7 +13,7 @@ class Vertex
     friend std::ostream & operator << (std::ostream& os, Vertex const & v);
     friend class ThreeBSP;
 public:
-    Vertex(double x, double y, double z, Vector3* normal = nullptr, Vector2* uv = nullptr);
+    Vertex(float x, float y, float z, Vector3* normal = nullptr, Vector2* uv = nullptr);
     Vertex(const Vertex *v);
     /**
      * @brief clone
@@ -40,7 +40,7 @@ public:
      * @param number
      * @return this multplied vector
      */
-    Vertex* multiplyScalar(double number);
+    Vertex* multiplyScalar(float number);
 
     /**
      * @brief cross multiplication
@@ -60,16 +60,16 @@ public:
      * @param other
      * @return the resulting number
      */
-    double dot(const Vertex *other);
+    float dot(const Vertex *other);
 
-    Vertex* lerp(Vertex* a, double t);
+    Vertex* lerp(Vertex* a, float t);
 
-    Vertex* interpolate(Vertex* other, double t);
+    Vertex* interpolate(Vertex* other, float t);
 
     Vertex* applyMatrix4(Matrix4* m);
 
 protected:
-  double x, y, z;
+  float x, y, z;
   Vector3* normal;
   Vector2* uv;
 };

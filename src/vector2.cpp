@@ -1,6 +1,6 @@
 #include "vector2.h"
 
-Vector2::Vector2(double x, double y):
+Vector2::Vector2(float x, float y):
     x{x},
     y{y}
 {
@@ -28,7 +28,7 @@ Vector2 *Vector2::sub(const Vector2 *other)
 
 }
 
-Vector2 *Vector2::multiplyScalar(double t)
+Vector2 *Vector2::multiplyScalar(float t)
 {
     x *= t;
     y *= t;

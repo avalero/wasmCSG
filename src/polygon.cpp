@@ -5,7 +5,7 @@
 
 #include "constants.h"
 
-Polygon::Polygon(std::vector<Vertex *> const & vertices, Vertex *normal, double w):
+Polygon::Polygon(std::vector<Vertex *> const & vertices, Vertex *normal, float w):
     vertices{vertices}
 {
     if(vertices.size() >= 3){
@@ -68,7 +68,7 @@ Polygon *Polygon::flip()
 
 int Polygon::classifyVertex(const Vertex *vertex)
 {
-    const double side_value = normal->dot(vertex) - w;
+    const float side_value = normal->dot(vertex) - w;
 
     if (side_value < -EPSILON) return BACK;
     if (side_value > EPSILON) return FRONT;
@@ -122,7 +122,7 @@ void Polygon::splitPolygon(Polygon *polygon, std::vector<Polygon *> &coplanar_fr
         Vertex *vi, *vj;
         std::vector<Vertex*> f, b;
 
-        double t;
+        float t;
         Vertex* v;
 
         for ( i = 0, vertice_count = polygon->vertices.size(); i < vertice_count; i++) {

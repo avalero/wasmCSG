@@ -9,6 +9,7 @@ class Vector3;
 class Face3
 {
     friend class ThreeBSP;
+    friend class Geometry;
 public:
     Face3(unsigned long a, unsigned long b, unsigned long c, Vector3* normal = nullptr);
     Face3(unsigned long a, unsigned long b, unsigned long c, std::vector<Vector3*> vertexNormals = {});
