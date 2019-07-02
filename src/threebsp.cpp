@@ -11,35 +11,41 @@
 
 #include <map>
 #include <sstream>
+#include <iostream>
 
 ThreeBSP::ThreeBSP(Geometry* _geometry)
 {
-    std::vector<Vector2*> faceVertexUvs;
-    Face3* face;
-    Polygon* polygon;
     std::vector<Polygon*> polygons;
     Geometry* geometry = _geometry;
     Vector3* vector3;
     Vertex* vertex;
-    Vector2* uvs;
+
 
     matrix = new Matrix4();
 
-    for(unsigned long i = 0, _length_i = geometry->faces.size(); i < _length_i; i++){
-        face = geometry->faces.at(i);
-        faceVertexUvs = geometry->faceVertexUvs.at(0).at(i);
-        polygon = new Polygon();
+    unsigned long int _length_i = geometry->faces.size();
 
-        // ASSUME THE FACE IS FACE3, IF NOT WE HAVE TO DEVELOP A FACE4 INSTANCE
+    for(unsigned long i = 0; i < _length_i; i++){
+
+        Face3* face = geometry->faces.at(i);
+
+        Polygon* polygon = new Polygon();
+
         vector3 = geometry->vertices.at(face->a);
-        if(faceVertexUvs.size()>0) uvs = new Vector2(faceVertexUvs.at(0)->x, faceVertexUvs.at(0)->y);
-        else throw std::string{"Error, faceVertexUvs <= 0"};
-        // Line 104 threeCSG.js -> TODO vertexNormals
-
-        vertex = new Vertex(vector3->x, vector3->y, vector3->z, face->vertexNormals.at(0), uvs);
+        vertex = new Vertex(vector3->x, vector3->y, vector3->z, face->vertexNormals.at(0));
         vertex->applyMatrix4(matrix);
         polygon->vertices.push_back(vertex);
-        // END ASSUME FACE IS FACE3, TO BE CHECKED
+
+
+        vector3 = geometry->vertices.at(face->b);
+        vertex = new Vertex(vector3->x, vector3->y, vector3->z, face->vertexNormals.at(1));
+        vertex->applyMatrix4(matrix);
+        polygon->vertices.push_back(vertex);
+
+        vector3 = geometry->vertices.at(face->c);
+        vertex = new Vertex(vector3->x, vector3->y, vector3->z, face->vertexNormals.at(2));
+        vertex->applyMatrix4(matrix);
+        polygon->vertices.push_back(vertex);
 
         polygon->calculateProperties();
         polygons.push_back(polygon);
@@ -108,34 +114,33 @@ ThreeBSP *ThreeBSP::intersect(const ThreeBSP *other_tree) const
 
 Geometry *ThreeBSP::toGeometry() const
 {
-    unsigned long i,j;
+
     Matrix4* _matrix = (new Matrix4())->getInverse(matrix);
     Geometry* _geometry = new Geometry();
+
     std::vector<Polygon*> _polygons = tree->allPolygons();
-    unsigned long polygon_count = _polygons.size();
+
     Polygon* _polygon;
-    unsigned long polygon_vertice_count;
     unsigned long vertex_idx_a;
     unsigned long vertex_idx_b;
     unsigned long vertex_idx_c;
-    Vertex* _vertex;
-    Vector3* _vector3;
+
+
     Face3* _face;
     std::map<std::string, unsigned long int> vertice_dict;
 
-    for(i=0; i < polygon_count; i++){
+
+    unsigned long polygon_count = _polygons.size();
+
+    for(unsigned long i=0; i < polygon_count; i++){
         _polygon = _polygons.at(i);
-        polygon_vertice_count = _polygon->vertices.size();
-
-        for(j=2; j < polygon_vertice_count; j++){
-            std::vector<Vector2*> verticesuVS;
-
-            _vertex = _polygon->vertices.at(0);
-            verticesuVS.push_back(new Vector2(_vertex->uv->x, _vertex->uv->y));
-            _vector3 = new Vector3(_vertex->x, _vertex->y, _vertex->z);
+        unsigned long polygon_vertice_count = _polygon->vertices.size();
+        for(unsigned long int j=2; j < polygon_vertice_count; j++){
+            std::vector<Vector2*> verticesUvs;
+            Vertex* _vertex = _polygon->vertices.at(0);
+            verticesUvs.push_back(new Vector2(_vertex->uv->x, _vertex->uv->y));
+            Vector3* _vector3 = new Vector3(_vertex->x, _vertex->y, _vertex->z);
             _vector3->applyMatrix4(_matrix);
-
-
             std::ostringstream stream;
             stream << _vector3->x <<","<< _vector3->y <<","<< _vector3->z;
             std::string key =  stream.str();
@@ -150,10 +155,14 @@ Geometry *ThreeBSP::toGeometry() const
 
 
             _vertex = _polygon->vertices.at(j-1);
-            verticesuVS.push_back(new Vector2(_vertex->uv->x, _vertex->uv->y));
+            verticesUvs.push_back(new Vector2(_vertex->uv->x, _vertex->uv->y));
             _vector3 = new Vector3(_vertex->x, _vertex->y, _vertex->z);
             _vector3->applyMatrix4(_matrix);
 
+
+            stream.str(std::string());
+            stream << _vector3->x <<","<< _vector3->y <<","<< _vector3->z;
+            key =  stream.str();
 
 
             if ( vertice_dict.find(key) != vertice_dict.end() ) {
@@ -164,11 +173,15 @@ Geometry *ThreeBSP::toGeometry() const
                 vertice_dict.insert(std::pair<std::string, unsigned long>(key, vertex_idx_b));
             }
 
+
             _vertex = _polygon->vertices.at(j);
-            verticesuVS.push_back(new Vector2(_vertex->uv->x, _vertex->uv->y));
+            verticesUvs.push_back(new Vector2(_vertex->uv->x, _vertex->uv->y));
             _vector3 = new Vector3(_vertex->x, _vertex->y, _vertex->z);
             _vector3->applyMatrix4(_matrix);
 
+            stream.str(std::string());
+            stream << _vector3->x <<","<< _vector3->y <<","<< _vector3->z;
+            key =  stream.str();
 
 
             if ( vertice_dict.find(key) != vertice_dict.end() ) {
@@ -179,13 +192,20 @@ Geometry *ThreeBSP::toGeometry() const
                 vertice_dict.insert(std::pair<std::string, unsigned long>(key, vertex_idx_c));
             }
 
+
             _face = new Face3(vertex_idx_a, vertex_idx_b, vertex_idx_c,
                               new Vector3(_polygon->normal->x, _polygon->normal->y,_polygon->normal->z ));
 
             _geometry->faces.push_back(_face);
-            _geometry->faceVertexUvs.at(0).push_back(verticesuVS);
+
+            if(_geometry->faceVertexUvs.size() == 0) _geometry->faceVertexUvs.push_back({verticesUvs});
+            else _geometry->faceVertexUvs.at(0).push_back(verticesUvs);
+
         }
+
     }
+
+
 
     return _geometry;
 }

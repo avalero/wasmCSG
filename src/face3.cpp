@@ -34,3 +34,10 @@ Face3 *Face3::copy(Face3 *source)
 
     return this;
 }
+
+std::ostream &operator <<(std::ostream &os, const Face3 &f)
+{
+    os << "a: " << f.a << ", b: " << f.b << ", c: " << f.c << " - ";
+    os << *(f.normal);
+    return os;
+}

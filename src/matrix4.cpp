@@ -1,11 +1,17 @@
 #include <string>
+#include <iostream>
 
 #include "matrix4.h"
 #include "constants.h"
 
 
 Matrix4::Matrix4():
-    elements{new std::array<float, 16>{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,0, 0, 0, 1}}}
+    elements{new std::array<float, 16>{{
+             1, 0, 0, 0,
+             0, 1, 0, 0,
+             0, 0, 1, 0,
+             0, 0, 0, 1
+             }}}
 {
 }
 
@@ -28,6 +34,7 @@ Matrix4 *Matrix4::getInverse(Matrix4* m)
     float det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
     if ( det <= EPSILON ) {
+        std::cout << "Cannot compute determinant" << std::endl;
         throw std::string{"Cannot compute determinant"};
     }
 

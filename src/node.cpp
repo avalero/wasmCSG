@@ -6,7 +6,7 @@
 
 Node::Node(const std::vector<Polygon *> _polygons)
 {
-    unsigned long i, polygon_count;
+
     std::vector<Polygon*> _front;
     std::vector<Polygon*> _back;
     
@@ -16,7 +16,8 @@ Node::Node(const std::vector<Polygon *> _polygons)
     
     divider = _polygons.at(0)->clone();
 
-    for(i=0, polygon_count = _polygons.size(); i < polygon_count; i++){
+    unsigned long int polygon_count = _polygons.size();
+    for(unsigned long int i=0; i < polygon_count; i++){
         divider->splitPolygon(
                     _polygons.at(i),
                     polygons,
@@ -31,8 +32,7 @@ Node::Node(const std::vector<Polygon *> _polygons)
 
     if(_back.size() > 0){
         back = new Node{_back};
-    }
-    
+    }  
 }
 
 bool Node::isConvex(const std::vector<Polygon *> _polygons) const

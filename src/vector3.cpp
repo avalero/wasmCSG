@@ -52,7 +52,10 @@ Vector3 *Vector3::multiplyScalar(float t)
 
 Vector3 *Vector3::divideScalar(float t)
 {
-    if(t <= 0.000001) throw std::string{"Cannot dived by 0"};
+    if(t <= 0.000001){
+        std::cout << "divideScalar: Cannot be divyded by 0" << std::endl;
+        throw std::string{"Cannot dived by 0"};
+    }
     x /= t;
     y /= t;
     z /= t;

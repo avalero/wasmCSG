@@ -14,19 +14,26 @@ using namespace emscripten;
 
 std::vector<Geometry*> geometries;
 BufferGeometry* buffGeom = nullptr;
+ThreeBSP* bsp = nullptr;
+
+
+std::ostream& operator << (std::ostream& os, std::vector<float> v){
+    for(auto e: v){
+        os << e << " - ";
+    }
+
+    return os;
+}
 
 int main()
 {
+    std::cout << "WASM Module Ready" << std::endl;
     geometries.clear();
+
     return 0;
 }
 
 extern "C" {
-EMSCRIPTEN_KEEPALIVE
-void buildCSG(float* buffer, int buffersize){
-    std::vector<float> my_vector {buffer, buffer + buffersize};
-}
-
 
 EMSCRIPTEN_KEEPALIVE
 void addGeometry(float* buffer, int vertices_size, int normals_size, int position_size){
@@ -38,19 +45,33 @@ void addGeometry(float* buffer, int vertices_size, int normals_size, int positio
     geometries.push_back(g);
 }
 
-void computeBufferGeometry(int i){
-    if(buffGeom) delete buffGeom;
-
-    if(i >= geometries.size()) throw std::string{"Out of bounds"};
-
-
-    Geometry* geom = geometries.at(i);
-    buffGeom = geom->toBufferGeometry();
+EMSCRIPTEN_KEEPALIVE
+void computeBSP(int i){
+    if(bsp) delete bsp;
+    std::cout << "geom to bsp" << std::endl;
+    bsp = new ThreeBSP(geometries.at(i));
+    std::cout << "Done!" << std::endl;
 }
 
 EMSCRIPTEN_KEEPALIVE
-float* getVerticesBuffer(int i){
-    computeBufferGeometry(i);
+void computeBufferGeomFromBSP(){
+    if (!bsp){
+        std::cout << "bsp not computed" << std::endl;
+        throw std::string{"bsp not computed"};
+    }
+
+    std::cout << "bsp to geom" << std::endl;
+    Geometry* geom = bsp->toGeometry();
+    std::cout << "geom computed" << std::endl;
+    if(buffGeom) delete buffGeom;
+    std::cout << "computing buffer geom" << std::endl;
+    buffGeom = geom->toBufferGeometry();
+    std::cout << "Done! " << std::endl;
+}
+
+
+EMSCRIPTEN_KEEPALIVE
+float* getVerticesBuffer(){
     if(buffGeom){
         return buffGeom->vertices->data();
     }
@@ -58,8 +79,7 @@ float* getVerticesBuffer(int i){
 }
 
 EMSCRIPTEN_KEEPALIVE
-float* getNormalsBuffer(int i){
-    computeBufferGeometry(i);
+float* getNormalsBuffer(){
     if(buffGeom){
         return buffGeom->normals->data();
     }
@@ -67,8 +87,7 @@ float* getNormalsBuffer(int i){
 }
 
 EMSCRIPTEN_KEEPALIVE
-int getVerticesSize(int i){
-    computeBufferGeometry(i);
+int getVerticesSize(){
     if(buffGeom){
         return buffGeom->vertices->size();
     }
@@ -76,21 +95,42 @@ int getVerticesSize(int i){
 }
 
 EMSCRIPTEN_KEEPALIVE
-int getNormalsSize(int i){
-    computeBufferGeometry(i);
+int getNormalsSize(){
     if(buffGeom){
-
         return buffGeom->normals->size();
     }
     throw std::string{"No buffer Geom computed"};
 }
+
+EMSCRIPTEN_KEEPALIVE
+void computeUnion(){
+    if(geometries.size() == 0){
+        std::cout << "Cannot perform union with 0 geometries" << std::endl;
+        throw std::string{"Cannot perform union with 0 geometries"};
+    }
+
+    std::cout << "Computing union of " << geometries.size() << "geometries" << std::endl;
+
+    ThreeBSP * result = new ThreeBSP(geometries.at(0));
+    std::cout << "BSP of first geometry done" << std::endl;
+    for(unsigned long int i{1}; i < geometries.size() ; i++){
+        result->comp_union(new ThreeBSP(geometries.at(i)));
+    }
+
+    buffGeom = result->toGeometry()->toBufferGeometry();
 }
 
+}
+
+
+
 EMSCRIPTEN_BINDINGS(wasmcsg_module) {
+    function("computeUnion", &computeUnion);
+    function("computeBSP", &computeBSP);
+    function("computeBufferGeomFromBSP", &computeBufferGeomFromBSP);
     function("getNormalsBuffer", &getNormalsBuffer, allow_raw_pointers());
     function("getVerticesBuffer", &getVerticesBuffer, allow_raw_pointers());
     function("getNormalsSize", &getNormalsSize);
     function("getVerticesSize", &getVerticesSize);
-    function("buildCSG", &buildCSG, allow_raw_pointers());
     function("addGeometry", &addGeometry, allow_raw_pointers());
 }
