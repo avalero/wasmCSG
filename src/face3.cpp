@@ -25,11 +25,14 @@ Face3 *Face3::clone() const
     return new Face3(a,b,c,normal->clone());
 }
 
-Face3 *Face3::copy(Face3 *source)
+Face3 *Face3::copy(const Face3 *source)
 {
     a = source->a;
     b = source->b;
     c = source->c;
+
+    //delete normal to set new one
+    if(normal) delete normal;
     normal = source->normal->clone();
 
     return this;
@@ -38,6 +41,6 @@ Face3 *Face3::copy(Face3 *source)
 std::ostream &operator <<(std::ostream &os, const Face3 &f)
 {
     os << "a: " << f.a << ", b: " << f.b << ", c: " << f.c << " - ";
-    os << *(f.normal);
+    os << " normal: " << *(f.normal);
     return os;
 }

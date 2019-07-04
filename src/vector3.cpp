@@ -13,6 +13,12 @@ Vector3::Vector3(float x, float y, float z):
 
 }
 
+Vector3::Vector3(const Vector3 *other):
+    Vector3{other->x, other->y, other->z}
+{
+
+}
+
 Vector3 *Vector3::clone() const
 {
     return new Vector3(x,y,z);
@@ -109,6 +115,20 @@ Vector3 *Vector3::copy(const Vector3 *other)
     x = other->x;
     y = other->y;
     z = other->z;
+
+    return this;
+}
+
+float Vector3::dot(const Vector3 *other) const
+{
+    return (x*other->x + y*other->y + z*other->z);
+}
+
+Vector3* Vector3::set(float _x, float _y, float _z)
+{
+    x = _x;
+    y = _y;
+    z = _z;
 
     return this;
 }
