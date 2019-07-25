@@ -15,6 +15,11 @@ Matrix4::Matrix4():
 {
 }
 
+Matrix4::~Matrix4()
+{
+    delete elements; elements = nullptr;
+}
+
 Matrix4 *Matrix4::getInverse(Matrix4* m)
 {
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
@@ -35,7 +40,7 @@ Matrix4 *Matrix4::getInverse(Matrix4* m)
 
     if ( det <= EPSILON ) {
         std::cout << "Cannot compute determinant" << std::endl;
-        throw std::string{"Cannot compute determinant"};
+        // throw std::runtime_error{"Cannot compute determinant"};
     }
 
     float detInv = 1 / det;

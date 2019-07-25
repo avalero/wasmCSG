@@ -1,10 +1,14 @@
 #ifndef BOX3_H
 #define BOX3_H
 
+#include <ostream>
+
 class Vector3;
 
 class Box3
 {
+    friend std::ostream & operator << (std::ostream & os, Box3 const & box);
+
 public:
     Box3(Vector3* min, Vector3* max);
     Box3();
@@ -15,5 +19,8 @@ public:
     Vector3* min;
     Vector3* max;
 };
+
+std::ostream & operator << (std::ostream & os, Box3 const & box);
+
 
 #endif // BOX3_H

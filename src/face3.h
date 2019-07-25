@@ -17,6 +17,7 @@ class Face3
 public:
     Face3(unsigned long a, unsigned long b, unsigned long c, Vector3* normal = nullptr);
     Face3(unsigned long a, unsigned long b, unsigned long c, std::vector<Vector3*> vertexNormals = {});
+    ~Face3();
     Face3* clone() const;
     Face3* copy(const Face3* source);
 

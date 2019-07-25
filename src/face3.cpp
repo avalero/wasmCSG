@@ -20,6 +20,15 @@ Face3::Face3(unsigned long a, unsigned long b, unsigned long c, std::vector<Vect
     normal = new Vector3();
 }
 
+Face3::~Face3()
+{
+    delete normal; normal = nullptr;
+    for(auto v: vertexNormals){
+        delete v; v = nullptr;
+    }
+    vertexNormals.clear();
+}
+
 Face3 *Face3::clone() const
 {
     return new Face3(a,b,c,normal->clone());
@@ -32,7 +41,7 @@ Face3 *Face3::copy(const Face3 *source)
     c = source->c;
 
     //delete normal to set new one
-    if(normal) delete normal;
+    delete normal;
     normal = source->normal->clone();
 
     return this;

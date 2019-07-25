@@ -28,6 +28,7 @@ public:
     Vector3* copy(const Vector3* other);
     float dot(const Vector3* other) const;
     Vector3* set(float _x, float _y, float _z);
+    Vector3* lerp(const Vector3 *v, float alpha);
 
 protected:
     float x,y,z;

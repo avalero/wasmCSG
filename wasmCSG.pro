@@ -5,6 +5,7 @@ CONFIG -= qt
 INCLUDEPATH += $$(EMSDK)/fastcomp/emscripten/system/include/
 
 SOURCES += \
+        src/booleans.cpp \
         src/box3.cpp \
         src/bspnode.cpp \
         src/buffergeometry.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
         src/vector3.cpp
 
 HEADERS += \
+        src/booleans.h \
         src/box3.h \
         src/bspnode.h \
         src/buffergeometry.h \

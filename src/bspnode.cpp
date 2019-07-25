@@ -10,12 +10,68 @@
 
 #include <array>
 #include <algorithm>
+#include <iostream>
 
-/**
- * Algorithm adapted from Binary Space Partioning Trees and Polygon Removal in Real Time 3D Rendering
- * Samuel Ranta-Eskola, 2001
- */
 
+Vector3 *BSPNode::interpolateVectors(const Vector3 *a, const Vector3 *b, float t)
+{
+    return a->clone()->lerp(b,t);
+}
+
+void BSPNode::splitTriangle(Triangle *triangle, const Triangle *divider, std::vector<Triangle *> & frontTriangles, std::vector<Triangle *> & backTriangles)
+{
+
+    std::vector<Vector3*> vertices = {triangle->a, triangle->b, triangle->c};
+
+
+    std::vector<Vector3*> frontVertices;
+    std::vector<Vector3*> backVertices;
+
+    for(unsigned short i = 0 ; i < 3 ; i++){
+        unsigned short j = (i + 1) % 3;
+        auto vi = vertices.at(i);
+        auto vj = vertices.at(j);
+        auto ti = divider->classifyPoint(vi);
+        auto tj = divider->classifyPoint(vj);
+
+        if(ti != CLASSIFY_BACK) frontVertices.push_back(vi);
+        if(ti != CLASSIFY_FRONT) backVertices.push_back(vi);
+        if(( ti | tj) == CLASSIFY_SPANNING){
+            auto vjClone = vj->clone();
+            float t = float(divider->w - divider->normal->dot(vi))/
+                    divider->normal->dot(vjClone->sub(vi));
+
+            delete vjClone; vjClone = nullptr;
+
+            Vector3* v = BSPNode::interpolateVectors(vi, vj, t);
+            frontVertices.push_back(v);
+            backVertices.push_back(v);
+        }
+    }
+
+    if(frontVertices.size() > 3){
+        auto aux = BSPNode::verticesToTriangles(frontVertices);
+        frontTriangles.insert(frontTriangles.end(), aux.begin(), aux.end());
+    }
+
+    if(backVertices.size() > 3){
+        auto aux = BSPNode::verticesToTriangles(backVertices);
+        backTriangles.insert(backTriangles.end(), aux.begin(), aux.end());
+    }
+}
+
+std::vector<Triangle*> BSPNode::verticesToTriangles(const std::vector<Vector3 *> & vertices)
+{
+    std::vector<Triangle*> triangles;
+    for(unsigned int i = 2; i < vertices.size(); i++){
+        auto a = vertices.at(0);
+        auto b = vertices.at(i-1);
+        auto c = vertices.at(i);
+        auto triangle = new Triangle(a,b,c);
+        triangles.push_back(triangle);
+    }
+    return triangles;
+}
 
 BSPNode::BSPNode(std::vector<Triangle *> _triangles):
     divider{nullptr},
@@ -29,26 +85,29 @@ BSPNode::BSPNode(std::vector<Triangle *> _triangles):
 
 BSPNode::~BSPNode()
 {
-    delete divider;
-    delete front;
-    delete back;
-    delete boundingBox;
+    delete divider; divider = nullptr;
+    delete front; front = nullptr;
+    delete back; back = nullptr;
+    delete boundingBox; boundingBox = nullptr;
     deleteTriangles();
 }
 
 void BSPNode::buildFrom(const std::vector<Triangle *> _triangles)
 {
+
     if(!divider){
         Triangle* bestDivider = chooseDividingTriangle(_triangles);
         if(!bestDivider){
-            divider = triangles.at(0)->clone();
+            divider = _triangles.at(0)->clone();
+            triangles = _triangles;
+
         }else{
             divider = bestDivider->clone();
-            deleteTriangles();
-            addTriangles(_triangles);
+            addTrianglesIterative(_triangles);
+
         }
     }else{
-        addTriangles(_triangles);
+        addTrianglesIterative(_triangles);
     }
 }
 
@@ -128,9 +187,15 @@ std::vector<Triangle *> BSPNode::clipTriangles(std::vector<Triangle *> _triangle
 
 std::vector<Triangle *> BSPNode::getTriangles() const
 {
-    auto _triangles = triangles;
-    if(front) _triangles.insert(_triangles.end(), front->getTriangles().begin(), front->getTriangles().end());
-    if(back) _triangles.insert(_triangles.end(), back->getTriangles().begin(), back->getTriangles().end());
+    std::vector<Triangle*> _triangles = triangles;
+    if(front){
+        std::vector<Triangle*> frontTr = front->getTriangles();
+        _triangles.insert(_triangles.end(), frontTr.begin(), frontTr.end());
+    }
+    if(back){
+        std::vector<Triangle*> backTr = back->getTriangles();
+        _triangles.insert(_triangles.end(), backTr.begin(), backTr.end());
+    }
 
     return _triangles;
 }
@@ -182,47 +247,63 @@ Geometry *BSPNode::toGeometry() const
 {
     Geometry* geometry = new Geometry();
 
-    auto triangles = getTriangles();
-    for(auto triangle: triangles){
+    std::vector<Triangle*> triangles = getTriangles();
+    for(unsigned long int i = 0; i < triangles.size(); i++){
+        Triangle* triangle = triangles.at(i);
         auto vertexIndex = geometry->vertices.size();
-        geometry->vertices.push_back(triangle->a);
-        geometry->vertices.push_back(triangle->b);
-        geometry->vertices.push_back(triangle->c);
-
-        auto face = new Face3(vertexIndex, vertexIndex +1, vertexIndex +2, triangle->normal);
+        geometry->vertices.push_back(triangle->a->clone());
+        geometry->vertices.push_back(triangle->b->clone());
+        geometry->vertices.push_back(triangle->c->clone());
+        Face3* face = new Face3(vertexIndex, vertexIndex +1, vertexIndex +2, triangle->normal->clone());
         geometry->faces.push_back(face);
     }
     return geometry;
 }
 
-void BSPNode::addTriangles(const std::vector<Triangle *> _triangles)
+void BSPNode::addTriangles(const std::vector<Triangle *> _triangles,
+                           std::vector<Triangle*> & frontTriangles,
+                           std::vector<Triangle*> & backTriangles )
 {
-    std::vector<Triangle*> frontTriangles;
-    std::vector<Triangle*> backTriangles;
+    frontTriangles.clear();
+    backTriangles.clear();
 
-
-
+    if(!divider) {
+        Triangle * bestTriangle = chooseDividingTriangle(_triangles);
+        divider = bestTriangle ? bestTriangle->clone() : _triangles.at(0);
+    }
     for(auto triangle: _triangles){
-        std::array<float, 4> aux1{ {boundingBox->min->x, triangle->a->x, triangle->b->x, triangle->c->x} };
-        std::array<float, 4> aux2{ {boundingBox->min->y, triangle->a->y, triangle->b->y, triangle->c->y} };
-        std::array<float, 4> aux3{ {boundingBox->min->z, triangle->a->z, triangle->b->z, triangle->c->z} };
+        std::array<float, 4> aux_x_min{ {boundingBox->min->x, triangle->a->x, triangle->b->x, triangle->c->x} };
+        std::array<float, 4> aux_y_min{ {boundingBox->min->y, triangle->a->y, triangle->b->y, triangle->c->y} };
+        std::array<float, 4> aux_z_min{ {boundingBox->min->z, triangle->a->z, triangle->b->z, triangle->c->z} };
 
-        auto minmax_x = std::minmax_element(aux1.begin(), aux1.end());
-        auto minmax_y = std::minmax_element(aux2.begin(), aux2.end());
-        auto minmax_z = std::minmax_element(aux3.begin(), aux3.end());
+        auto min_x = std::min_element(aux_x_min.begin(), aux_x_min.end());
+        auto min_y = std::min_element(aux_y_min.begin(), aux_y_min.end());
+        auto min_z = std::min_element(aux_z_min.begin(), aux_z_min.end());
 
         boundingBox->min->set(
-                    *minmax_x.first,
-                    *minmax_y.first,
-                    *minmax_z.first
-                    );
-        boundingBox->max->set(
-                    *minmax_x.second,
-                    *minmax_y.second,
-                    *minmax_z.second
+                    *min_x,
+                    *min_y,
+                    *min_z
                     );
 
-        auto side = divider->classifySide(triangle);
+        std::array<float, 4> aux_x_max{ {boundingBox->max->x, triangle->a->x, triangle->b->x, triangle->c->x}};
+        std::array<float, 4> aux_y_max{ {boundingBox->max->y, triangle->a->y, triangle->b->y, triangle->c->y}};
+        std::array<float, 4> aux_z_max{ {boundingBox->max->z, triangle->a->z, triangle->b->z, triangle->c->z}};
+
+        auto max_x = std::max_element(aux_x_max.begin(), aux_x_max.end());
+        auto max_y = std::max_element(aux_y_max.begin(), aux_y_max.end());
+        auto max_z = std::max_element(aux_z_max.begin(), aux_z_max.end());
+
+        boundingBox->max->set(
+                    *max_x,
+                    *max_y,
+                    *max_z
+                    );
+
+
+
+        SIDE_CLASSIFICATION side = divider->classifySide(triangle);
+
         switch(side){
         case CLASSIFY_COPLANAR:
             triangles.push_back(triangle);
@@ -237,25 +318,68 @@ void BSPNode::addTriangles(const std::vector<Triangle *> _triangles)
             BSPNode::splitTriangle(triangle, divider, frontTriangles, backTriangles);
 
         }
+    }
+}
 
-        if(frontTriangles.size() > 0){
-            if(!front) front = new BSPNode(frontTriangles);
-            else front->addTriangles(frontTriangles);
+void BSPNode::addTrianglesIterative(const std::vector<Triangle *> &triangles)
+{
+    std::vector<HeapItem*> heap;
+    std::vector<Triangle*> frontTriangles;
+    std::vector<Triangle*> backTriangles;
+
+    addTriangles(triangles, frontTriangles, backTriangles);
+
+
+    if(backTriangles.size() > 0){
+        std::cout << "back" << std::endl;
+        if(!back) back = new BSPNode();
+        heap.push_back(new HeapItem{backTriangles, back});
+    }
+
+
+    if(frontTriangles.size() > 0){
+        std::cout << "front" << std::endl;
+        if(!front) front = new BSPNode();
+        heap.push_back(new HeapItem{frontTriangles, front});
+    }
+
+
+    int i = 0;
+    while(heap.size() > 0){
+        std::cout << ++i << std::endl;
+        std::vector<Triangle*> frontTriangles;
+        std::vector<Triangle*> backTriangles;
+
+        HeapItem* item = heap.back();
+        heap.pop_back();
+
+        BSPNode* node = item->node;
+        std::vector<Triangle*> triangles = item->triangles;
+
+        node->addTriangles(triangles, frontTriangles, backTriangles);
+
+        if (backTriangles.size() > 0) {
+            std::cout << "back" << std::endl;
+
+            if (!(node->back)) node->back = new BSPNode();
+            heap.push_back(new HeapItem{backTriangles,node->back});
         }
 
-        if(backTriangles.size() > 0){
-            if(!back) back = new BSPNode(backTriangles);
-            else back->addTriangles(backTriangles);
+        if (frontTriangles.size() > 0) {
+            std::cout << "front" << std::endl;
+
+            if (!(node->front)) node->front = new BSPNode();
+            heap.push_back(new HeapItem{frontTriangles,node->front});
         }
 
-
+        delete item;
     }
 }
 
 void BSPNode::deleteTriangles()
 {
     for(auto t: triangles){
-        delete t;
+        delete t; t=nullptr;
     }
     triangles.clear();
 }
@@ -263,7 +387,7 @@ void BSPNode::deleteTriangles()
 Triangle *chooseDividingTriangle(const std::vector<Triangle *> _triangles)
 {
     if(_triangles.size() == 0) return nullptr;
-    return _triangles.at(0);
+    return _triangles.at(_triangles.size()/2);
 
     // TODO!!!!
 }

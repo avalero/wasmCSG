@@ -7,6 +7,7 @@ class Matrix4
 {
 public:
     Matrix4();
+    ~Matrix4();
 
     Matrix4* getInverse(Matrix4* m);
     std::array<float, 16>* elements;

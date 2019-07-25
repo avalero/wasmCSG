@@ -4,6 +4,8 @@
 #include "geometry.h"
 #include "vector3.h"
 
+#include <iostream>
+
 std::vector<Triangle *> convertGeometryToTriangles(const Geometry *geometry)
 {
     std::vector<Triangle*> triangles;
@@ -16,9 +18,7 @@ std::vector<Triangle *> convertGeometryToTriangles(const Geometry *geometry)
         Vector3* a = vertices.at(face->a);
         Vector3* b = vertices.at(face->b);
         Vector3* c = vertices.at(face->c);
-
         Triangle* triangle = new Triangle(a,b,c);
-
         triangles.push_back(triangle);
     }
 

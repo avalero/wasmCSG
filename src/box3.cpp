@@ -22,8 +22,8 @@ Box3::Box3(){
 
 Box3::~Box3()
 {
-    delete min;
-    delete max;
+    delete min; min = nullptr;
+    delete max; max = nullptr;
 }
 
 bool Box3::intersectsBox(const Box3 *box) const
@@ -32,4 +32,11 @@ bool Box3::intersectsBox(const Box3 *box) const
     return !(box->max->x < min->x || box->min->x > max->x ||
             box->max->y < min->y || box->min->y > max->y ||
             box->max->z < min->z || box->min->z > max->z);
+}
+
+std::ostream &operator <<(std::ostream &os, const Box3 &box)
+{
+    os << "min: " << *box.min << std::endl;
+    os << "max: " << *box.max << std::endl;
+    return os;
 }

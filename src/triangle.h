@@ -1,6 +1,9 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
+#include <ostream>
+#include <vector>
+
 #include "constants.h"
 
 class Vector3;
@@ -8,8 +11,10 @@ class Vector3;
 class Triangle
 {
     friend class BSPNode;
+    friend std::ostream & operator << (std::ostream & os, Triangle const & t);
 public:
     Triangle(const Vector3 *a, const Vector3 *b, const Vector3 *c);
+    ~Triangle();
 
 
 protected:
@@ -27,5 +32,8 @@ public:
     Triangle* clone() const;
 
 };
+
+std::ostream & operator << (std::ostream & os, Triangle const & t);
+std::ostream& operator << (std::ostream& os, std::vector<Triangle*> v);
 
 #endif // TRIANGLE_H

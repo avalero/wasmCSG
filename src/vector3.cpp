@@ -60,7 +60,7 @@ Vector3 *Vector3::divideScalar(float t)
 {
     if(t <= 0.000001){
         std::cout << "divideScalar: Cannot be divyded by 0" << std::endl;
-        throw std::string{"Cannot dived by 0"};
+        // throw std::runtime_error{"Cannot dived by 0"};
     }
     x /= t;
     y /= t;
@@ -129,6 +129,15 @@ Vector3* Vector3::set(float _x, float _y, float _z)
     x = _x;
     y = _y;
     z = _z;
+
+    return this;
+}
+
+Vector3 *Vector3::lerp(const Vector3 *v, float alpha)
+{
+    x += (v->x - x)*alpha;
+    y += (v->y - y)*alpha;
+    z += (v->z - z)*alpha;
 
     return this;
 }

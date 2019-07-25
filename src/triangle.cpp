@@ -3,6 +3,7 @@
 #include "vector3.h"
 #include "math.h"
 
+#include <iostream>
 
 Triangle::Triangle(const Vector3 *a, const Vector3 *b, const Vector3 *c):
     a{a->clone()},
@@ -15,12 +16,20 @@ Triangle::Triangle(const Vector3 *a, const Vector3 *b, const Vector3 *c):
 
 }
 
+Triangle::~Triangle()
+{
+    delete a; a = nullptr;
+    delete b; b = nullptr;
+    delete c; c = nullptr;
+}
+
 void Triangle::computeNormal()
 {
-    Vector3* temp{c};
+    Vector3* temp{c->clone()};
     temp->sub(a);
     normal->copy(b)->sub(a)->cross(temp)->normalize();
     w = normal->dot(a);
+    delete temp;
 }
 
 SIDE_CLASSIFICATION Triangle::classifyPoint(const Vector3* point) const
@@ -37,7 +46,6 @@ SIDE_CLASSIFICATION Triangle::classifySide(const Triangle *triangle) const
     side = SIDE_CLASSIFICATION(side | classifyPoint(triangle->a));
     side = SIDE_CLASSIFICATION(side | classifyPoint(triangle->b));
     side = SIDE_CLASSIFICATION(side | classifyPoint(triangle->c));
-
     return side;
 }
 
@@ -55,4 +63,25 @@ void Triangle::invert()
 Triangle *Triangle::clone() const
 {
     return new Triangle(a,b,c);
+}
+
+std::ostream &operator <<(std::ostream &os, const Triangle &t)
+{
+    os << "a: " << *t.a << std::endl;
+    os << "b: " << *t.b << std::endl;
+    os << "c: " << *t.c << std::endl;
+    os << "normal: " << *t.normal << std::endl;
+    os << "w: " << t.w << std::endl;
+    return os;
+}
+
+std::ostream& operator << (std::ostream& os, std::vector<Triangle*> v){
+    int i = 0;
+    for(auto e: v){
+        os << i <<": "<< *e << std::endl;
+        i++;
+    }
+    os << std::endl;
+
+    return os;
 }

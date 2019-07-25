@@ -9,6 +9,6 @@ BufferGeometry::BufferGeometry(std::vector<float>* vertices, std::vector<float>*
 
 BufferGeometry::~BufferGeometry()
 {
-    if(vertices) delete vertices;
-    if(normals) delete normals;
+    delete vertices; vertices = nullptr;
+    delete normals; normals = nullptr;
 }
